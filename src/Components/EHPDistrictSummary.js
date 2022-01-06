@@ -1,98 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./EHPDistrictSummary.css";
+import { getAllAddress } from "./../api/APIUtils";
 
 const EHPDistrictSummary = () => {
-  const districtSummary = [
-    {
-      district: "Goroka",
-      cases: 33,
-      deaths: 33,
-      active: 0,
-      recovered: 0,
-      twentyfourhours: 0,
-      totaltests: 0,
-      testing: 0,
-      positivity: 0,
-    },
-    {
-      district: "Kainantu",
-      cases: 33,
-      deaths: 33,
-      active: 0,
-      recovered: 0,
-      twentyfourhours: 0,
-      totaltests: 0,
-      testing: 0,
-      positivity: 0,
-    },
-    {
-      district: "Daulo",
-      cases: 33,
-      deaths: 33,
-      active: 0,
-      recovered: 0,
-      twentyfourhours: 0,
-      totaltests: 0,
-      testing: 0,
-      positivity: 0,
-    },
-    {
-      district: "Lufa",
-      cases: 33,
-      deaths: 33,
-      active: 0,
-      recovered: 0,
-      twentyfourhours: 0,
-      totaltests: 0,
-      testing: 0,
-      positivity: 0,
-    },
-    {
-      district: "Okapa",
-      cases: 33,
-      deaths: 33,
-      active: 0,
-      recovered: 0,
-      twentyfourhours: 0,
-      totaltests: 0,
-      testing: 0,
-      positivity: 0,
-    },
-    {
-      district: "Henganofi",
-      cases: 33,
-      deaths: 33,
-      active: 0,
-      recovered: 0,
-      twentyfourhours: 0,
-      totaltests: 0,
-      testing: 0,
-      positivity: 0,
-    },
-    {
-      district: "Unggai/Bena",
-      cases: 33,
-      deaths: 33,
-      active: 0,
-      recovered: 0,
-      twentyfourhours: 0,
-      totaltests: 0,
-      testing: 0,
-      positivity: 0,
-    },
-    {
-      district: "Obura/Wonernara",
-      cases: 33,
-      deaths: 33,
-      active: 0,
-      recovered: 0,
-      twentyfourhours: 0,
-      totaltests: 0,
-      testing: 0,
-      positivity: 0,
-    },
-  ];
-
+  const [data, setdata] = useState([]);
+  useEffect(() => {
+    getAllAddress()
+      .then((data) => {
+        console.log(data);
+        setdata(
+          data.data.filter((dat) => dat.name === "eastern highlands")[0]
+            .districts
+        );
+      })
+      .catch((err) => console.log(err.response));
+  }, []);
   return (
     <>
       <h3 className="eph-summary-heading">EPH DISTRICT COVID-19 SUMMARY</h3>
@@ -113,41 +35,32 @@ const EHPDistrictSummary = () => {
             </tr>
           </thead>
 
-          {districtSummary.map((item, i) => {
-            if (i % 2 == 0) {
+          {data
+            ?.sort((a, b) => {
+              if (a.name > b.name) return 1;
+              if (a.name < b.name) return -1;
+              return 0;
+            })
+            .map((item, i) => {
               return (
-                <tbody>
+                <tbody
+                  style={i % 2 != 0 ? { backgroundColor: "#ddd" } : null}
+                  className="row"
+                >
                   <tr>
-                    <td>{item.district}</td>
-                    <td>{item.cases}</td>
+                    <td>{item.name}</td>
+                    <td>{item.totalCases}</td>
                     <td>{item.deaths}</td>
                     <td>{item.active}</td>
                     <td>{item.recovered}</td>
-                    <td>{item.twentyfourhours}</td>
-                    <td>{item.totaltests}</td>
-                    <td>{item.testing}</td>
-                    <td>{item.positivity}</td>
+                    <td>{item.twentyfourhours || 0}</td>
+                    <td>{item.totalTested}</td>
+                    <td>{item.totalTested / 100} %</td>
+                    <td>{item.totalCases}</td>
                   </tr>
                 </tbody>
               );
-            } else {
-              return (
-                <tbody>
-                  <tr style={{ backgroundColor: "#dddddd" }}>
-                    <td>{item.district}</td>
-                    <td>{item.cases}</td>
-                    <td>{item.deaths}</td>
-                    <td>{item.active}</td>
-                    <td>{item.recovered}</td>
-                    <td>{item.twentyfourhours}</td>
-                    <td>{item.totaltests}</td>
-                    <td>{item.testing}</td>
-                    <td>{item.positivity}</td>
-                  </tr>
-                </tbody>
-              );
-            }
-          })}
+            })}
         </table>
       </div>
     </>
